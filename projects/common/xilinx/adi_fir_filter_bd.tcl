@@ -19,6 +19,7 @@ proc ad_add_decimation_filter {name filter_rate n_chan parallel_paths \
 
   create_bd_pin -dir I $name/aclk
   create_bd_pin -dir I $name/active
+  create_bd_pin -dir I $name/VCC
 
   # Adding the ad_bus_axis.v file in the project fileset sources_1 will not work
   add_files -norecurse  $ad_hdl_dir/library/common/ad_bus_mux.v
@@ -117,6 +118,14 @@ proc ad_add_interpolation_filter {name filter_rate n_chan parallel_paths \
 
   create_bd_pin -dir I $name/aclk
   create_bd_pin -dir I $name/active
+  create_bd_pin -dir I $name/VCC
+
+  # cdc active/source
+  create_bd_cell -type module -reference sync_bits $name/cdc_sync_active
+
+  ad_connect $name/aclk $name/cdc_sync_active/out_clk
+  ad_connect $name/VCC $name/cdc_sync_active/out_resetn
+  ad_connect $name/active $name/cdc_sync_active/in_bits
 
   # cdc active/source
   create_bd_cell -type module -reference sync_bits $name/cdc_sync_active
